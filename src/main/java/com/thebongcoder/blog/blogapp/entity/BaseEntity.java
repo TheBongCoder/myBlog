@@ -2,6 +2,7 @@ package com.thebongcoder.blog.blogapp.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 
 @JsonIgnoreProperties(value = {"createdAt", "updatedAt"})
 @Getter
+@Setter
 @MappedSuperclass
 public class BaseEntity {
     @Id
