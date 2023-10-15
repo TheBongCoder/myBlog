@@ -4,22 +4,29 @@ import com.thebongcoder.blog.blogapp.dto.PostDTO;
 import com.thebongcoder.blog.blogapp.dto.PostResponse;
 import com.thebongcoder.blog.blogapp.service.PostService;
 import com.thebongcoder.blog.blogapp.utils.AppConstants;
+import com.thebongcoder.blog.blogapp.utils.ResponseHandler;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import lombok.extern.slf4j.Slf4j;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/posts")
+@Slf4j
 public class PostController {
 
+    private final ResponseHandler responseHandler;
     private final PostService postService;
 
-    public PostController(PostService postService) {
+    public PostController(PostService postService, ResponseHandler responseHandler) {
         this.postService = postService;
+        this.responseHandler = responseHandler;
     }
 
     @PostMapping
-    public ResponseEntity<Object> createPost(@RequestBody PostDTO postDTO) {
+    public ResponseEntity<Object> createPost(@Valid @RequestBody PostDTO postDTO) {
         PostDTO postResponse = postService.createPost(postDTO);
         return new ResponseEntity<>(postResponse, HttpStatus.CREATED);
     }
@@ -35,15 +42,16 @@ public class PostController {
 
     @GetMapping("/{postId}")
     public ResponseEntity<Object> getPostById(@PathVariable(value = AppConstants.POST_ID) long id) {
+
         PostDTO post = postService.getPostById(id);
         if (post != null) {
-            return new ResponseEntity<>(post, HttpStatus.OK);
+            return responseHandler.generateResponse(post, "Post Details fetch successfully", false, HttpStatus.OK);
         }
-        return new ResponseEntity<>(post, HttpStatus.NOT_FOUND);
+        return responseHandler.generateResponse(post, "PostId not found", false, HttpStatus.NOT_FOUND);
     }
 
     @PutMapping("/{postId}")
-    public ResponseEntity<Object> updatePost(@RequestBody PostDTO postDTO, @PathVariable(value = AppConstants.POST_ID) long id) {
+    public ResponseEntity<Object> updatePost(@Valid @RequestBody PostDTO postDTO, @PathVariable(value = AppConstants.POST_ID) long id) {
         PostDTO updatePost = postService.updatePost(postDTO, id);
         if (updatePost != null) {
             return new ResponseEntity<>(updatePost, HttpStatus.OK);

@@ -1,8 +1,10 @@
 package com.thebongcoder.blog.blogapp.service;
 
+import com.thebongcoder.blog.blogapp.dto.CommentDTO;
 import com.thebongcoder.blog.blogapp.dto.PostDTO;
 import com.thebongcoder.blog.blogapp.dto.PostResponse;
 import com.thebongcoder.blog.blogapp.entity.Post;
+import com.thebongcoder.blog.blogapp.exceptions.ResourceNotFoundException;
 import com.thebongcoder.blog.blogapp.repository.PostRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -12,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -61,12 +64,13 @@ public class PostService {
     public PostDTO getPostById(long id) {
         log.info("Get Post By Id : " + id);
         Post post = postRepository.findById(id).orElse(null);
-        if (post == null) return null;
+        if (post == null) throw  new ResourceNotFoundException("Post","id",id);
         PostDTO postDTOResponse = new PostDTO();
         postDTOResponse.setId(post.getId());
         postDTOResponse.setTitle(post.getTitle());
         postDTOResponse.setDescription(post.getDescription());
         postDTOResponse.setContent(post.getContent());
+        postDTOResponse.setCommentDTOs((new HashSet<>(modelMapperService.mapAll(post.getComments(), CommentDTO.class))));
         return postDTOResponse;
     }
 
@@ -86,6 +90,8 @@ public class PostService {
         postDTOResponse.setTitle(updatedPost.getTitle());
         postDTOResponse.setDescription(updatedPost.getDescription());
         postDTOResponse.setContent(updatedPost.getContent());
+        postDTOResponse.setCommentDTOs((new HashSet<>(modelMapperService.mapAll(post.getComments(), CommentDTO.class))));
+
         return postDTOResponse;
     }
 
@@ -111,6 +117,8 @@ public class PostService {
         List<PostDTO> postDTOList = new ArrayList<>();
         for (Post post : posts.getContent()) {
             PostDTO postDTO = modelMapperService.map(post, PostDTO.class);
+            List<CommentDTO> commentDTOList = modelMapperService.mapAll(post.getComments(), CommentDTO.class);
+            postDTO.setCommentDTOs(new HashSet<>(commentDTOList));
             postDTOList.add(postDTO);
         }
         PostResponse postResponse = new PostResponse();
