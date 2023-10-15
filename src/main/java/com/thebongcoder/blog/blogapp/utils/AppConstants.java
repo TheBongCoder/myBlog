@@ -11,5 +11,5 @@ public class AppConstants {
     public static final String PAGE_SIZE="pageSize";
     public static final String PAGE_SORT_BY="sortBy";
     public static final String PAGE_SORT_DIR="sortDir";
-    public static final String POST_ID="sortDir";
+    public static final String POST_ID="postId";
 }

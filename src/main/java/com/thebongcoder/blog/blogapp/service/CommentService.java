@@ -25,6 +25,7 @@ public class CommentService {
         log.info("create comment request received for : {}", commentDTO.getId());
         Comment comment = mapToEntity(commentDTO);
         Post post = postRepository.findById(postId).orElse(null);
+        if (post == null) return null;
         comment.setPost(post);
         comment = commentRepository.save(comment);
         return mapToDTO(comment);
