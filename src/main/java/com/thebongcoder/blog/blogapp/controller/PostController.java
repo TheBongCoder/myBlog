@@ -7,6 +7,7 @@ import com.thebongcoder.blog.blogapp.utils.AppConstants;
 import com.thebongcoder.blog.blogapp.utils.ResponseHandler;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,6 +26,7 @@ public class PostController {
         this.responseHandler = responseHandler;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<Object> createPost(@Valid @RequestBody PostDTO postDTO) {
         PostDTO postResponse = postService.createPost(postDTO);
@@ -50,6 +52,7 @@ public class PostController {
         return responseHandler.generateResponse(post, "PostId not found", false, HttpStatus.NOT_FOUND);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{postId}")
     public ResponseEntity<Object> updatePost(@Valid @RequestBody PostDTO postDTO, @PathVariable(value = AppConstants.POST_ID) long id) {
         PostDTO updatePost = postService.updatePost(postDTO, id);
@@ -59,7 +62,7 @@ public class PostController {
         return new ResponseEntity<>(updatePost, HttpStatus.NOT_FOUND);
     }
 
-
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{postId}")
     public ResponseEntity<Object> deletePost(@PathVariable(value = AppConstants.POST_ID) long id) {
         boolean deletePost = postService.deletePost(id);
