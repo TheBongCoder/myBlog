@@ -1,7 +1,9 @@
 package com.thebongcoder.blog.blogapp.controller;
 
+import com.thebongcoder.blog.blogapp.dto.JwtAuthResponseDTO;
 import com.thebongcoder.blog.blogapp.dto.LoginDTO;
 import com.thebongcoder.blog.blogapp.dto.SignUpDTO;
+import com.thebongcoder.blog.blogapp.security.JwtTokenProvider;
 import com.thebongcoder.blog.blogapp.service.AuthService;
 import com.thebongcoder.blog.blogapp.utils.ResponseHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,12 +33,21 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
 
     @PostMapping("signIn")
     public ResponseEntity<Object> signInUser(@RequestBody LoginDTO loginDTO) {
-        Authentication authenticated = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getUserNameOrEmail(), loginDTO.getPassword().toLowerCase()));
-        SecurityContextHolder.getContext().setAuthentication(authenticated);
-        return responseHandler.generateResponse("", "User signIn successfully", true, HttpStatus.OK);
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getUserNameOrEmail(), loginDTO.getPassword().toLowerCase()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        //get Token from tokenProvider
+
+        String token = jwtTokenProvider.generateToken(authentication);
+        JwtAuthResponseDTO jwtAuthResponseDTO = new JwtAuthResponseDTO();
+        jwtAuthResponseDTO.setAccessToken(token);
+        return responseHandler.generateResponse(jwtAuthResponseDTO, "User signIn successfully", true, HttpStatus.OK);
     }
 
     @PostMapping("signUp")
