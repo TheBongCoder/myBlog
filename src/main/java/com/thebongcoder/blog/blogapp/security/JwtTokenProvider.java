@@ -42,7 +42,7 @@ public class JwtTokenProvider {
 
         Claims claims = Jwts.parser()
                 .setSigningKey(envConfig.getJwtSecretKey())
-                .parseClaimsJwt(token)
+                .parseClaimsJws(token)
                 .getBody();
         return claims.getSubject();// getUsername
     }
